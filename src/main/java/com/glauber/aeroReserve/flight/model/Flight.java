@@ -1,30 +1,37 @@
 package com.glauber.aeroReserve.flight.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Entity
 public class Flight {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String flightNumber;
     private String origin;
     private String destination;
+    @Column(name = "DEPARTURE_DATETIME")
     private LocalDateTime departureDateTime;
+    @Column(name = "ARRIVAL_DATETIME")
     private LocalDateTime arrivalDateTime;
-    private int numPassengers;
+    @Column(name = "PASSEGER_COUNT")
+    private int passagerCount;
     private BigDecimal price;
 
-    public Flight(String flightNumber, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, int numPassengers, BigDecimal price) {
+    public Flight(String flightNumber, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, int passagerCount, BigDecimal price) {
         this.flightNumber = flightNumber;
         this.origin = origin;
         this.destination = destination;
         this.departureDateTime = departureDateTime;
         this.arrivalDateTime = arrivalDateTime;
-        this.numPassengers = numPassengers;
+        this.passagerCount = passagerCount;
         this.price = price;
+    }
+
+    public Flight() {
+
     }
 
     public Long getId() {
@@ -75,12 +82,12 @@ public class Flight {
         this.arrivalDateTime = arrivalDateTime;
     }
 
-    public int getNumPassengers() {
-        return numPassengers;
+    public int getPassagerCount() {
+        return passagerCount;
     }
 
-    public void setNumPassengers(int numPassengers) {
-        this.numPassengers = numPassengers;
+    public void setPassagerCount(int passagerCount) {
+        this.passagerCount = passagerCount;
     }
 
     public BigDecimal getPrice() {
