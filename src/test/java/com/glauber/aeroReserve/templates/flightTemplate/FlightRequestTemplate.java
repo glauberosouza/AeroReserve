@@ -2,7 +2,6 @@ package com.glauber.aeroReserve.templates.flightTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.Month;
 
 public class FlightRequestTemplate {
 
@@ -23,6 +22,13 @@ public class FlightRequestTemplate {
                 BigDecimal.valueOf(120.0)
         );
     }
+
+    public static void update(FlightRequest creation) {
+        creation.departureDateTime().plusDays(3);
+        creation.arrivalDateTime().plusDays(5);
+    }
+
+
     public static FlightRequest invalidFlight() {
         LocalDateTime departureDateTime = LocalDateTime.now().plusDays(2);
         LocalDateTime arrivalDateTime = LocalDateTime.of(

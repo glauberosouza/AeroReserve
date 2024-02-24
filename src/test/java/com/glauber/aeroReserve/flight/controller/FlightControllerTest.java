@@ -2,6 +2,10 @@ package com.glauber.aeroReserve.flight.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glauber.aeroReserve.BaseCompTest;
+import com.glauber.aeroReserve.flight.model.Flight;
+import com.glauber.aeroReserve.flight.repository.FlightRepository;
+import com.glauber.aeroReserve.flight.service.IFlightService;
+import com.glauber.aeroReserve.templates.flightTemplate.FlightRequest;
 import com.glauber.aeroReserve.templates.flightTemplate.FlightRequestTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,10 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FlightControllerTest extends BaseCompTest {
@@ -21,6 +29,8 @@ class FlightControllerTest extends BaseCompTest {
     private MockMvc mvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private IFlightService service;
 
     @DisplayName("Deve cadastrar um voo com sucesso")
     @Test
@@ -60,18 +70,40 @@ class FlightControllerTest extends BaseCompTest {
         assertTrue(invalidFlight.destination().isEmpty());
         assertTrue(invalidFlight.origin().isEmpty());
     }
+
     @DisplayName("Deve encontrar um voo pelo id")
     @Sql(value = "/db.sql/insert_into_flight.sql")
     @Test
     void shouldFindAAFlightById() throws Exception {
         // GIVEN
+
         // WHEN
-        mvc.perform(get("/v1/flights" + 1)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mvc.perform(get("/v1/flights/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("origin", is("São Paulo")));
 
         // THEN
     }
+    @Sql(value = {"/db.sql/insert_into_flight.sql", "/db.sql/update_flight.sql"})
+    @DisplayName("Deve atualizar um voo")
+    @Test
+    void shouldUpdateAFlight() throws Exception {
+        // GIVEN
+        var flightById = service.findFlightById(1L);
+        var body = objectMapper.writeValueAsString(flightById);
+
+        // WHEN
+        mvc.perform(put("/v1/flights/update/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        // THEN
+        assertEquals(LocalDateTime.of(2024, 10, 11, 21, 0),
+                flightById.getArrivalDateTime());
+    }
+
 }
 /*
 
