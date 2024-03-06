@@ -9,8 +9,11 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
     private String flightNumber;
+    @Column
     private String origin;
+    @Column
     private String destination;
     @Column(name = "DEPARTURE_DATETIME")
     private LocalDateTime departureDateTime;
@@ -18,6 +21,7 @@ public class Flight {
     private LocalDateTime arrivalDateTime;
     @Column(name = "PASSEGER_COUNT")
     private int passagerCount;
+    @Column
     private BigDecimal price;
 
     public Flight(String flightNumber, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, int passagerCount, BigDecimal price) {

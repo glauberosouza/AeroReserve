@@ -2,10 +2,7 @@ package com.glauber.aeroReserve.flight.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glauber.aeroReserve.BaseCompTest;
-import com.glauber.aeroReserve.flight.model.Flight;
-import com.glauber.aeroReserve.flight.repository.FlightRepository;
 import com.glauber.aeroReserve.flight.service.IFlightService;
-import com.glauber.aeroReserve.templates.flightTemplate.FlightRequest;
 import com.glauber.aeroReserve.templates.flightTemplate.FlightRequestTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,10 +15,8 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FlightControllerTest extends BaseCompTest {
@@ -103,7 +98,19 @@ class FlightControllerTest extends BaseCompTest {
         assertEquals(LocalDateTime.of(2024, 10, 11, 21, 0),
                 flightById.getArrivalDateTime());
     }
+    @DisplayName("Deve deletar um voo pelo id")
+    @Sql(value = "/db.sql/insert_into_flight.sql")
+    @Test
+    void shouldDeleteAFlightById() throws Exception {
+        // GIVEN
 
+        // WHEN
+        mvc.perform(delete("/v1/flights/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isNoContent());
+        // THEN
+    }
 }
 /*
 

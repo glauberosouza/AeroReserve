@@ -2,7 +2,6 @@ package com.glauber.aeroReserve.flight.controller;
 
 import com.glauber.aeroReserve.flight.controller.request.FlightRequest;
 import com.glauber.aeroReserve.flight.controller.response.FlightResponse;
-import com.glauber.aeroReserve.flight.model.Flight;
 import com.glauber.aeroReserve.flight.service.IFlightService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -37,5 +36,11 @@ public class FlightController {
         var flightEntity = FlightRequest.toFlightEntity(flightRequest);
         flightService.update(flightId, flightEntity);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{flightId}")
+    public ResponseEntity<Void> deleteFlight(@PathVariable Long flightId) {
+        flightService.deleteFlight(flightId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
