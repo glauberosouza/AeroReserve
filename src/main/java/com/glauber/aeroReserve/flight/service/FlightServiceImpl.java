@@ -20,10 +20,11 @@ public class FlightServiceImpl implements IFlightService {
     }
 
     @Override
-    public void update(Long flightId, Flight flight) {
-        var Flight = findFlightById(flightId);
-        Flight.setDepartureDateTime(flight.getDepartureDateTime());
-        Flight.setArrivalDateTime(flight.getArrivalDateTime());
+    public void update(Long flightId, Flight newFlight) {
+        var flight = findFlightById(flightId);
+        flight.setDepartureDateTime(newFlight.getDepartureDateTime());
+        flight.setArrivalDateTime(newFlight.getArrivalDateTime());
+        repository.save(flight);
     }
 
     @Override
