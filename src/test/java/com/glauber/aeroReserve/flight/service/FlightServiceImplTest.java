@@ -11,6 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -46,6 +49,7 @@ class FlightServiceImplTest {
         // THEN
         assertEquals("São Paulo", flight.getDestination());
     }
+
     @Test
     @DisplayName("Não Deve salvar um voo caso encontre campos vazios ou nulos")
     public void shouldNotSaveFlight() {
@@ -61,6 +65,7 @@ class FlightServiceImplTest {
         assertNull(flight);
         assertEquals(true, allFlights.isEmpty());
     }
+
     @Test
     @DisplayName("Deve atualizar um voo com sucesso")
     public void shouldUpdateFlight() {
@@ -80,18 +85,67 @@ class FlightServiceImplTest {
 
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
 
-        Flight flightToUpdate = new Flight();
+        var flightToUpdate = new Flight();
 
-        LocalDateTime expectedDepartureDateTime = LocalDateTime.now().plusDays(1);
-        LocalDateTime expectedArrivalDateTime = LocalDateTime.now().plusDays(4);
+        var expectedDepartureDateTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.SECONDS);
+        var expectedArrivalDateTime = LocalDateTime.now().plusDays(4).truncatedTo(ChronoUnit.SECONDS);
 
         flightToUpdate.setDepartureDateTime(expectedDepartureDateTime);
         flightToUpdate.setArrivalDateTime(expectedArrivalDateTime);
 
-
         // WHEN
         flightService.update(1L, flightToUpdate);
         // THEN
-        assertEquals(LocalDateTime.now().plusDays(4), flight.getArrivalDateTime());
+
+        assertEquals(LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.SECONDS), flight.getDepartureDateTime().truncatedTo(ChronoUnit.SECONDS));
     }
+
+    @Test
+    @DisplayName("Deve encontrar um voo pelo id")
+    public void shouldFindAFlightById() {
+        // GIVEN
+        var flight = new Flight();
+        flight.setId(1L);
+        flight.setFlightNumber("1A");
+        flight.setOrigin("Rio Grande do Sul");
+        flight.setDestination("São Paulo");
+        flight.setDepartureDateTime(LocalDateTime.now());
+        flight.setArrivalDateTime(LocalDateTime.now().plusDays(3));
+        flight.setPassagerCount(64);
+        flight.setPrice(BigDecimal.valueOf(120.0));
+
+        when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
+
+        // WHEN
+        var flightById = flightService.findFlightById(1L);
+        // THEN
+
+        assertEquals(1L, flightById.getId());
+        assertEquals("Rio Grande do Sul", flightById.getOrigin());
+    }
+
+    @Test
+    @DisplayName("Deve deletar um voo pelo id")
+    public void shouldDeleteAFlightById() {
+        // GIVEN
+        var flight = new Flight();
+        flight.setId(1L);
+        flight.setFlightNumber("1A");
+        flight.setOrigin("Rio Grande do Sul");
+        flight.setDestination("São Paulo");
+        flight.setDepartureDateTime(LocalDateTime.now());
+        flight.setArrivalDateTime(LocalDateTime.now().plusDays(3));
+        flight.setPassagerCount(64);
+        flight.setPrice(BigDecimal.valueOf(120.0));
+
+        when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
+
+        // WHEN
+        flightService.deleteFlight(1L);
+        var allFlight = flightRepository.findAll();
+        // THEN
+        assertEquals(0, allFlight.size());
+        assertTrue(allFlight.isEmpty());
+    }
+
 }
